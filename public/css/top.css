@@ -1,0 +1,66 @@
+@charset "UTF-8";
+
+* {
+	margin: 0px;
+	padding: 0px;
+}
+
+body {}
+
+.main {
+	padding-left: 10px;
+	margin: auto;
+}
+
+/* >>>>> パレット領域 */
+.palette {
+	margin-top: 5px;
+	margin-bottom: 10px;
+}
+.palette li {
+	width: 44px;
+	height: 44px;
+	margin: auto;
+	list-style-type: none;
+	border: 1px solid #ccc;
+	border-radius: 6px;
+	display: table-cell;
+	vertical-align: middle;
+}
+.btnBlack {
+	background-color: black;
+}
+.btnRed {
+	background-color: red;
+}
+.btnBlue {
+	background-color: blue;
+}
+.btnGreen {
+	background-color: green;
+}
+.btnSmall {
+	text-align: center;
+}
+.btnMiddle {
+	text-align: center;
+}
+.btnLarge {
+	text-align: center;
+}
+.btnDel {
+	text-align: center;
+}
+/* <<<<< パレット領域 */
+
+/* >>>>> 描画領域 */
+.drawArea {
+	width: 325px;
+	height: 450px;
+	border: 1px solid #ccc;
+}
+#drawCanvas {
+	width: 325px;
+	height: 450px;
+}
+/* <<<<< 描画領域 */
