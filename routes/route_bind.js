@@ -1,10 +1,11 @@
 /**
- * route bind
+ * route bindings
  *
+ * @package Route
  * @author T.Shoji
- * @copyright 2012-2015 Nodecom Group,Ltd. All Rights Reserved.
+ * @copyright 2012-2015 Nodecom Group All Rights Reserved.
  */
 
 module.exports = function (app, routes) {
-  app.use('/', routes.top);
+  app.use('/', routes.demo);
 };

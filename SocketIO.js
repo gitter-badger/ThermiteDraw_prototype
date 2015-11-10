@@ -2,27 +2,24 @@
  * Socket.IO
  *
  * @author T.Shoji
- * @copyright 2012-2015 Nodecom Group,Ltd. All Rights Reserved.
+ * @copyright 2012-2015 Nodecom Group All Rights Reserved.
  */
 
 module.exports = function (app) {
-  var debug = require('debug')('ThermitePaint:server');
+  var debug = require('debug')('ThermiteDraw:server');
   var http  = require('http').Server(app);
   var io    = require('socket.io')(http);
 
   io.on('connection', function (socket) {
     socket.on("draw", function (data) {
-      // console.log(data);
       socket.broadcast.emit("draw", data);
     });
 
     socket.on("color", function (color) {
-      // console.log(color);
       socket.broadcast.emit("color", color);
     });
 
     socket.on("lineWidth", function (width) {
-      // console.log(width);
       socket.broadcast.emit("lineWidth", width);
     });
 

@@ -1,9 +1,59 @@
 /**
- * script for top page.
+ * Drawing script
  *
  * @author T.Shoji
- * @copyright 2012-2015 Nodecom Group,Ltd. All Rights Reserved.
+ * @copyright 2012-2015 Nodecom Group All Rights Reserved.
  */
+
+// グローバル変数定義
+var drawArea;
+var canvas;
+var context;
+var screenMode = 'black';
+var lineColors;
+
+/**
+ * canvasの初期化処理
+ */
+function initialize() {
+
+  drawArea = document.getElementsByClassName("drawArea")[0];
+  canvas   = document.getElementById("drawCanvas");
+  context  = canvas.getContext("2d");
+
+  canvas.width  = drawArea.clientWidth;
+  canvas.height = drawArea.clientHeight;
+
+  if (screenMode == 'white') {
+    lineColors = {
+      default: 'black',
+      red: 'red',
+      blue: 'blue',
+      green: 'green',
+      yellow: ''
+    };
+  } else {
+    lineColors = {
+      default: 'white',
+      red: '#fe2e64',
+      blue: '#2e9afe',
+      yellow: '#f7fe2e',
+      green: ''
+    };
+  }
+  context.strokeStyle = lineColors.default;
+  context.lineWidth   = 10;
+  context.lineJoin    = "round";
+  context.lineCap     = "round";
+
+}
+
+/**
+ * 画面モード変更処理
+ *
+ * TODO: 画面モードの切り替え処理実装
+ */
+function changeScreenMode() {}
 
 $(function () {
 
@@ -11,23 +61,11 @@ $(function () {
   var socket = io.connect("/");
 
   // 変数定義
-  var canvas = document.getElementById("drawCanvas");
-  var c = canvas.getContext("2d");
   var drawing = false;
   var oldPos, spOldPos;
-  var img = new Image();
-  img.src = "/img/sample_01.png";
 
   // canvasの初期化
-  canvas.width  = 325;
-  canvas.height = 450;
-  c.strokeStyle = "#000000";
-  c.lineWidth   = 5;
-  c.lineJoin    = "round";
-  c.lineCap     = "round";
-  img.onload = (function () {
-    c.drawImage(img, 0, 0, canvas.width, canvas.height);
-  });
+  initialize();
 
   /* >>>>> canvas上の座標を計算する為の関数 */
   function scrollX() {
@@ -51,23 +89,20 @@ $(function () {
   /* >>>>> canvasに描画する処理 */
   // PC向け処理
   canvas.addEventListener("mousedown", function (event) {
-    // console.log("mousedown");
     drawing = true;
     oldPos  = getPos(event);
   }, false);
   canvas.addEventListener("mouseup", function () {
-    // console.log("mouseup");
     drawing = false;
   }, false);
   canvas.addEventListener("mousemove", function (event) {
     var pos = getPos(event);
-    // console.log("mousemove : x=" + pos.x + ", y=" + pos.y + ", drawing=" + drawing);
     if (drawing) {
-      c.beginPath();
-      c.moveTo(oldPos.x, oldPos.y);
-      c.lineTo(pos.x, pos.y);
-      c.stroke();
-      c.closePath();
+      context.beginPath();
+      context.moveTo(oldPos.x, oldPos.y);
+      context.lineTo(pos.x, pos.y);
+      context.stroke();
+      context.closePath();
 
       // Socket.IOに描画情報を送付
       socket.emit("draw", {before:oldPos, after:pos});
@@ -75,7 +110,6 @@ $(function () {
     }
   }, false);
   canvas.addEventListener("mouseout", function () {
-    // console.log("mouseout");
     drawing = false;
   }, false);
 
@@ -94,11 +128,11 @@ $(function () {
   canvas.addEventListener("touchmove", function (event) {
     var pos = getPosT(event);
     if (drawing) {
-      c.beginPath();
-      c.moveTo(spOldPos.x, spOldPos.y);
-      c.lineTo(pos.x, pos.y);
-      c.stroke();
-      c.closePath();
+      context.beginPath();
+      context.moveTo(spOldPos.x, spOldPos.y);
+      context.lineTo(pos.x, pos.y);
+      context.stroke();
+      context.closePath();
 
       // Socket.IOに描画情報を送付
       socket.emit("draw", {before:spOldPos, after:pos});
@@ -108,32 +142,40 @@ $(function () {
   /* <<<<< canvasに描画する処理 */
 
   /* >>>>> メニューボタン関連の処理 */
+  $(".btnWhite").click(function () {
+    context.strokeStyle = "white";
+    socket.emit("color", "white");
+  });
   $(".btnBlack").click(function () {
-    c.strokeStyle = "black";
+    context.strokeStyle = "black";
     socket.emit("color", "black");
   });
   $(".btnRed").click(function () {
-    c.strokeStyle = "red";
-    socket.emit("color", "red");
+    context.strokeStyle = lineColors.red;
+    socket.emit("color", lineColors.red);
   });
   $(".btnBlue").click(function () {
-    c.strokeStyle = "blue";
-    socket.emit("color", "blue");
+    context.strokeStyle = lineColors.blue;
+    socket.emit("color", lineColors.blue);
+  });
+  $(".btnYellow").click(function () {
+    context.strokeStyle = lineColors.yellow;
+    socket.emit("color", lineColors.yellow);
   });
   $(".btnGreen").click(function () {
-    c.strokeStyle = "green";
-    socket.emit("color", "green");
+    context.strokeStyle = lineColors.green;
+    socket.emit("color", lineColors.green);
   });
   $(".btnSmall").click(function () {
-    c.lineWidth = 5;
+    context.lineWidth = 5;
     socket.emit("lineWidth", 5);
   });
   $(".btnMiddle").click(function () {
-    c.lineWidth = 10;
+    context.lineWidth = 10;
     socket.emit("lineWidth", 10);
   });
   $(".btnLarge").click(function () {
-    c.lineWidth = 20;
+    context.lineWidth = 20;
     socket.emit("lineWidth", 20);
   });
   $(".btnDel").click(function () {
@@ -145,24 +187,21 @@ $(function () {
   /* >>>>> Socket.IOからイベント情報を受け取った時の処理 */
   // canvasに描画
   socket.on("draw", function (data) {
-    // console.log("on draw : " + data);
-    c.beginPath();
-    c.moveTo(data.before.x, data.before.y);
-    c.lineTo(data.after.x, data.after.y);
-    c.stroke();
-    c.closePath();
+    context.beginPath();
+    context.moveTo(data.before.x, data.before.y);
+    context.lineTo(data.after.x, data.after.y);
+    context.stroke();
+    context.closePath();
   });
 
   // 色の変更
   socket.on("color", function (data) {
-    // console.log("on color : " + data);
-    c.strokeStyle = data;
+    context.strokeStyle = data;
   });
 
   // 線の太さを変更
   socket.on("lineWidth", function (data) {
-    // console.log("on lineWidth : " + data);
-    c.lineWidth = data;
+    context.lineWidth = data;
   });
 
   // canvasに描画されている内容のクリア
@@ -174,3 +213,12 @@ $(function () {
   socket.on();
 
 }, false);
+
+/**
+ * !!!!Caution!!!!
+ * スマホではリサイズが起こり得ないと思うので
+ * タイミングをみてこのリスナーは削除する。
+ */
+$(window).resize(function () {
+  initialize();
+});

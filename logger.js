@@ -2,7 +2,7 @@
  * Logger(Log4js)
  *
  * @author T.Shoji
- * @copyright 2012-2015 Nodecom Group,Ltd. All Rights Reserved.
+ * @copyright 2012-2015 Nodecom Group All Rights Reserved.
  */
 
 var log4js = require('log4js');
